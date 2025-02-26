@@ -1,12 +1,5 @@
 package org.example;
 
-// Взаимодействие с пользователем
-// Scanner; ввод/вывод
-// while(true)
-// switch-case
-// List; Map
-
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,36 +7,16 @@ import java.util.Scanner;
 
 public class Main {
 
+    static final String ID = "id";
     static final String NAME = "name";
     static final String DESC = "desc";
     static final String STATUS = "status";
 
-
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         System.out.println("Добро пожаловать в Менеджер Задач!");
 
-        // [1, 2, 5, 2, 1, 2, 1, 0]
-        // ["привет", "как", "жизнь", "друзья"]
-        // {
-        //   "name": "Моя задача",
-        //   "desc": "Моя самая первая задача",
-        //   "status": "OPEN",
-        // }
-/*
-[
-     {
-       "name": "Моя задача",
-       "desc": "Моя самая первая задача",
-       "status": "OPEN",
-    },
-    {
-       "name": "Моя задача номер 2",
-       "desc": "Моя самая вторая задача",
-       "status": "IN_PROGRESS",
-    },
-]
- */
-        List<Map<String, String>> tasks = new ArrayList<>();
+        Storage storage = new Storage();
+        Scanner scanner = new Scanner(System.in);
 
         while (true) {
 
@@ -53,17 +26,16 @@ public class Main {
             System.out.println("0 - Выход");
             System.out.print("> ");
 
-            Scanner scanner = new Scanner(System.in);
             String userInput = scanner.nextLine();
             switch (userInput) {
                 case "1" -> {
                     System.out.println("Все задачи");
+                    List<Map<String, String>> tasks = storage.getAll();
                     if (tasks.isEmpty()) {
                         System.out.println("Задачи отсутствуют");
                     } else {
-                        for (int i = 0; i < tasks.size(); i++) {
-                            Map<String, String> task = tasks.get(i);
-                            System.out.println("№ " + (i + 1));
+                        for (Map<String, String> task : tasks) {
+                            System.out.println("№ " + task.get(ID));
                             System.out.println("Имя: " + task.get(NAME));
                             System.out.println("Описание: " + task.get(DESC));
                             System.out.println("Статус: " + task.get(STATUS));
@@ -74,38 +46,35 @@ public class Main {
                     System.out.println("Создание задачи");
                     Map<String, String> task = new HashMap<>();
 
-                    // name: Моя задача номер 1
                     System.out.print("Введите имя задачи: ");
                     String taskName = scanner.nextLine();
                     task.put(NAME, taskName);
 
-                    // desc: Подробное описание моей задачи
                     System.out.print("Введите описание задачи: ");
                     String taskDesc = scanner.nextLine();
                     task.put(DESC, taskDesc);
 
-                    // status: OPEN
                     System.out.print("Введите статус задачи: ");
                     String taskStatus = scanner.nextLine();
                     task.put(STATUS, taskStatus);
-                    tasks.add(task);
+                    storage.addNew(task);
                 }
                 case "3" -> {
                     System.out.println("Обновление задачи");
-                    if (tasks.isEmpty()) {
+                    if (storage.getAll().isEmpty()) {
                         System.out.println("Задачи отсутствуют");
                     } else {
                         System.out.print("Введите номер задачи для обновления: ");
                         int taskId = scanner.nextInt();
                         scanner.nextLine();
-                        Map<String, String> task = tasks.get(taskId - 1);
                         System.out.print("Введите статус задачи: ");
                         String taskStatus = scanner.nextLine();
-                        task.put(STATUS, taskStatus);
+                        storage.changeStatus(taskId, taskStatus);
                     }
                 }
                 case "0" -> {
                     System.out.println("Выход");
+                    scanner.close();
                     return;
                 }
                 default -> System.out.println("Команда не поддерживается");
